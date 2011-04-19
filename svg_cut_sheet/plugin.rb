@@ -1,9 +1,7 @@
-require 'sketchup.rb'
-require 'extensions.rb'
-require 'LangHandler.rb'
-require File.expand_path('../sketchup_mixins.rb', __FILE__)
-require File.expand_path('../cut.rb', __FILE__)
-require File.expand_path('../pulled_face.rb', __FILE__)
+require 'sketchup'
+require 'extensions'
+require 'svg_cut_sheet/cut'
+require 'svg_cut_sheet/pulled_face'
 
 module SvgCutSheet
   class Plugin
@@ -53,5 +51,3 @@ module SvgCutSheet
 
   end
 end
-
-SvgCutSheet::Plugin.register
