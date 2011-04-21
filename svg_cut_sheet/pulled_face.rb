@@ -1,14 +1,6 @@
 module SvgCutSheet
   class PulledFace
 
-    attr_reader :face, :opposite, :depth
-
-    def initialize(face, opposite)
-      @face = face
-      @opposite = opposite
-      @depth = PulledFace.distance_between(face, opposite)
-    end
-
     def self.all_from_group(group)
       pulled = []
       group.faces.map do |f|
@@ -21,7 +13,7 @@ module SvgCutSheet
     end
 
     def self.largest_from_group(group)
-      all_from_group(group).sort { |a, b| a.depth <=> b.depth }.last
+      all_from_group(group).sort { |a, b| a.depth <=> b.depth }.first
     end
 
     def self.from_face(face)
@@ -56,6 +48,33 @@ module SvgCutSheet
 
     def self.distance_between(face1, face2)
       face1.vertices.first.position.distance_to_plane(face2.plane)
+    end
+
+    ###########################################################################
+
+    attr_reader :face, :opposite, :depth
+
+    def initialize(face, opposite)
+      @face = face
+      @opposite = opposite
+      @depth = PulledFace.distance_between(face, opposite)
+    end
+
+    def normalized
+      shape = face.transform_to_xy_plane
+
+      # If oriented vertically, re-orient horizontally
+      if width(shape) < height(shape)
+        shape = shape.map { |v| Geom::Point3d.new v.y, v.x, 0 }
+      end
+      # Make sure we order the vertices in a standard way.
+      # The first vertex should have the smallest x value (using smallest y values as a tie-breaker)
+      shape = reorder(shape)
+      #puts "SHAPE: #{shape}"
+      #puts "ALT: #{alt_dis.keys.sort * '|'}"
+      cut = Cut.new(shape, min_dis, alt_dis)
+      cnt = cut_hash[cut]
+      cut_hash[cut] = cnt ? cnt + 1 : 1
     end
 
   end
